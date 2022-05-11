@@ -55,6 +55,7 @@ public class SFS2XConnectorGame {
 
 	private void onLogin(BaseEvent evt) {
 		System.out.println("Logged in as: " + sfs.getMySelf().getName());
+		sfs.send(new ExtensionRequest("joingame", null));
 	}
 
 	private void onLoginError(BaseEvent evt) {
@@ -64,6 +65,7 @@ public class SFS2XConnectorGame {
 
 	private void onExtensionResponse(BaseEvent evt) throws SFSException {
 		String cmd = (String) evt.getArguments().get("cmd");
+		System.out.println("CMD: " + cmd);
 		ISFSObject responseParams = (SFSObject) evt.getArguments().get("params");
 
 		switch (cmd) {
@@ -72,12 +74,12 @@ public class SFS2XConnectorGame {
 					responseParams.getInt("player2Id"), responseParams.getUtfString("player2"));
 			break;
 
-		case "actionReceive":
-			actionReceive(responseParams.getInt("currentNumber"), responseParams.getUtfString("message"));
+		case "match":
+			actionReceive(responseParams.getInt("currentNumber"));
 			break;
-
-		case "actionSend":
-			actionSend(sfs.getMySelf().getName());
+			
+		case "notMatch":
+			actionReceive(responseParams.getInt("currentNumber"));
 			break;
 
 		case "win":
@@ -91,10 +93,8 @@ public class SFS2XConnectorGame {
 	}
 
 	private void startGame(int p1Id, String player1, int p2Id, String player2) {
-		Scanner scan = new Scanner(System.in);
 		SFSObject obj = new SFSObject();
-		System.out.println("Enter arraySize: \t");
-		obj.putInt("arraySize", scan.nextInt());
+		obj.putInt("arraySize", 9);
 		obj.putUtfString("player1", player1);
 		obj.putUtfString("player2", player2);
 		obj.putInt("player1Id", p1Id);
@@ -103,34 +103,21 @@ public class SFS2XConnectorGame {
 		sfs.send(new ExtensionRequest("start", obj));
 	}
 
-	private void actionSend(String username) {
-		Scanner scan = new Scanner(System.in);
+	private void actionSend(int numberServer) {
 		SFSObject obj = new SFSObject();
-		obj.putInt("playerChoice", getRandomNumber(0, 10));
-		
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
+		obj.putInt("playerChoice", numberServer);		
 		sfs.send(new ExtensionRequest("actionSend", obj));	
 	}
 
-	private void actionReceive(Integer currentNumber, String message) {	
-		System.out.println(message);
+	private void actionReceive(Integer currentNumber) {	
 		System.out.println("New random from server: " + currentNumber);
-		
+		actionSend(currentNumber);
 	}
 
 	private void showWinner(String winnerPlayer) {
-		System.out.printf("Winner: PlayerId = %s\n", winnerPlayer);		
+		System.out.printf("Winner:  %s\n", winnerPlayer);		
 		System.out.println("Logout: " + sfs.getMySelf().getName());
 		logOut();
-	}
-
-	private void onJoinGame() {
-		sfs.send(new ExtensionRequest("joingame", null));
 	}
 	
 	private void logOut() {
@@ -146,8 +133,6 @@ public class SFS2XConnectorGame {
 		System.out.println("Enter username: \t");
 		Scanner scan = new Scanner(System.in);
 		String username = scan.nextLine();
-		SFS2XConnectorGame sfsConn = new SFS2XConnectorGame(username);
-		Thread.sleep(2000);
-		sfsConn.onJoinGame();		
+		SFS2XConnectorGame sfsConn = new SFS2XConnectorGame(username);	
 	}
 }
