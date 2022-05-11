@@ -9,12 +9,9 @@ import com.smartfoxserver.v2.exceptions.SFSException;
 import sfs2x.client.SmartFox;
 import sfs2x.client.core.BaseEvent;
 import sfs2x.client.core.SFSEvent;
-import sfs2x.client.entities.Room;
-import sfs2x.client.entities.User;
 import sfs2x.client.requests.ExtensionRequest;
 import sfs2x.client.requests.JoinRoomRequest;
 import sfs2x.client.requests.LoginRequest;
-import sfs2x.client.requests.PublicMessageRequest;
 import sfs2x.client.util.ConfigData;
 
 public class SFS2XConnector
@@ -39,10 +36,7 @@ public class SFS2XConnector
         sfs.addEventListener(SFSEvent.CONNECTION_LOST, this::onConnectionLost);
         sfs.addEventListener(SFSEvent.LOGIN, this::onLogin);
         sfs.addEventListener(SFSEvent.LOGIN_ERROR, this::onLoginError);
-        sfs.addEventListener(SFSEvent.ROOM_JOIN, this::onRoomJoin);
-        sfs.addEventListener(SFSEvent.ROOM_JOIN_ERROR, this::onRoomJoinErr);
-        sfs.addEventListener(SFSEvent.EXTENSION_RESPONSE, this::onExtensionResponse);
-        sfs.addEventListener(SFSEvent.PUBLIC_MESSAGE, this::onShowMessage);
+        sfs.addEventListener(SFSEvent.EXTENSION_RESPONSE, this::onExtensionResponse);;
  
         // Connect to server
         sfs.connect(cfg);
@@ -84,33 +78,6 @@ public class SFS2XConnector
         System.out.println("Login failed. Cause: " + message);
     }
     
-    private void onRoomJoin(BaseEvent evt) {
-    	Room room = (Room) evt.getArguments().get("room");
-        System.out.println("Joined Room: " + room.getName());
-    }
-    
-    private void onRoomJoinErr(BaseEvent evt) {
-    	 System.out.println("Room creation failed: " + evt.getArguments().get("errorMessage"));
-    }
-    
-    private void onSendMessage() {
-    	System.out.println("Enter message: \t");
-    	Scanner scan = new Scanner(System.in);
-        String message = scan.nextLine();
-        
-        sfs.send(new PublicMessageRequest(message));       
-    }
-    
-    private void onShowMessage(BaseEvent evt) 
-    {
-    	 User sender = (User)evt.getArguments().get("sender");
-         
-         if (sender == sfs.getMySelf()) {
-        	 System.out.println("Me: " + evt.getArguments().get("message"));
-         } else {
-        	 System.out.printf("%s: %s\n", sender.getName(), evt.getArguments().get("message"));
-         }
-    }
     
     private void onExtensionResponse(BaseEvent evt) throws SFSException
     {
@@ -126,7 +93,7 @@ public class SFS2XConnector
 		}
     }
     
-    private void onSendMessage2() {
+    private void onSendMessage() {
     	//System.out.println("Enter message: \t");
     	Scanner scan = new Scanner(System.in);
         ISFSObject params = new SFSObject();
@@ -144,7 +111,7 @@ public class SFS2XConnector
         Thread.sleep(1000);
         
     	while(true) {
-            sfsConn.onSendMessage2();
+            sfsConn.onSendMessage();
             Thread.sleep(1000);
     	}
     }
