@@ -1,5 +1,7 @@
 package com.client.chat;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 
 import com.smartfoxserver.v2.entities.data.ISFSObject;
@@ -79,7 +81,7 @@ public class SFS2XConnectorGame {
 			break;
 
 		case "win":
-			showWinner(responseParams.getUtfString("winnerPlayer"));
+			showWinner(responseParams.getUtfStringArray("winnerList"));
 			break;
 
 		case "logout":
@@ -99,8 +101,11 @@ public class SFS2XConnectorGame {
 		actionSend(serverRandomNumber);
 	}
 
-	private void showWinner(String winnerPlayer) {
-		System.out.printf("Winner:  %s\n", winnerPlayer);		
+	private void showWinner(Collection<String> collection) {
+		collection.forEach(item -> {
+			System.out.printf("Winner:  %s\n", item);		
+		});
+		
 		System.out.println("Logout: " + sfs.getMySelf().getName());
 		logOut();
 	}
