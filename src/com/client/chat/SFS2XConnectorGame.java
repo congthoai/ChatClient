@@ -69,17 +69,13 @@ public class SFS2XConnectorGame {
 		ISFSObject responseParams = (SFSObject) evt.getArguments().get("params");
 
 		switch (cmd) {
-		case "start":
-			startGame(responseParams.getInt("player1Id"), responseParams.getUtfString("player1"),
-					responseParams.getInt("player2Id"), responseParams.getUtfString("player2"));
-			break;
 
 		case "match":
-			actionReceive(responseParams.getInt("currentNumber"));
+			actionReceive(responseParams.getInt("serverRandomNumber"));
 			break;
 			
 		case "notMatch":
-			actionReceive(responseParams.getInt("currentNumber"));
+			actionReceive(responseParams.getInt("serverRandomNumber"));
 			break;
 
 		case "win":
@@ -92,26 +88,15 @@ public class SFS2XConnectorGame {
 		}
 	}
 
-	private void startGame(int p1Id, String player1, int p2Id, String player2) {
-		SFSObject obj = new SFSObject();
-		obj.putInt("arraySize", 9);
-		obj.putUtfString("player1", player1);
-		obj.putUtfString("player2", player2);
-		obj.putInt("player1Id", p1Id);
-		obj.putInt("player2Id", p2Id);
-
-		sfs.send(new ExtensionRequest("start", obj));
-	}
-
 	private void actionSend(int numberServer) {
 		SFSObject obj = new SFSObject();
 		obj.putInt("playerChoice", numberServer);		
 		sfs.send(new ExtensionRequest("actionSend", obj));	
 	}
 
-	private void actionReceive(Integer currentNumber) {	
-		System.out.println("New random from server: " + currentNumber);
-		actionSend(currentNumber);
+	private void actionReceive(Integer serverRandomNumber) {	
+		System.out.println("New random from server: " + serverRandomNumber);
+		actionSend(serverRandomNumber);
 	}
 
 	private void showWinner(String winnerPlayer) {
